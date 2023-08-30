@@ -1,0 +1,9 @@
+build/
+.vs/
+.vscode/
+backends/
+imgui/
+SDK/
+libs/
+libacfutils/
+Makefile (copy)
