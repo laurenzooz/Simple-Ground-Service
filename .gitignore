@@ -2,8 +2,7 @@ build/
 .vs/
 .vscode/
 backends/
-imgui/
-SDK/
+imgui/examples
+imgui/docs
 libs/
-libacfutils/
 Makefile (copy)
