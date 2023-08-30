@@ -302,8 +302,6 @@ static float update_nearest_airport(float time_since_last_call, float time_since
 				Busses.resize(get_amount_of_vehicle("bus"));
 			}
 
-			std::cout << "There are now " << Stairs_small.size() << " stairs\n";
-
 			// TODO: in global mode get the proper amount
 
 			// TODO: if not in global mode, assign as many local vehicles as possibles, but if can't do all (the amount of vehicles in acf-in scenery)

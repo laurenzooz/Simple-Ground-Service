@@ -696,7 +696,6 @@ std::vector<std::string> get_icaos() {
 
 	for (int i = 0; i < supported_airports.size(); i++) { // get the keys 
 		icaos.push_back(supported_airports[i].first);
-		std::cout << "ICAO: " << icaos[i] << std::endl;
 	}
 
 	return icaos;

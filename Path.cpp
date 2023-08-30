@@ -915,7 +915,7 @@ double measure_path_distance(std::vector<std::vector<double>> path)
 
 
 
-std::vector<std::vector<double>> global_mode_route(std::string acf_vehicle_name, std::string vehicle_type)
+std::vector<std::vector<double>> global_mode_route(std::string acf_vehicle_name, std::string vehicle_type, std::string desired_stand)
 {
 	//XPLMDebugString("Setting global route!: ");
 	//XPLMDebugString(acf_vehicle_name.c_str());
@@ -929,12 +929,23 @@ std::vector<std::vector<double>> global_mode_route(std::string acf_vehicle_name,
 	XPLMDataRef plane_z_pos_ref = XPLMFindDataRef("sim/flightmodel/position/local_z");
 	XPLMDataRef heading = XPLMFindDataRef("sim/flightmodel/position/psi");
 
+	double pos_x, pos_z, pos_hdg;
+
+	if (desired_stand.length() > 0) { // if desired stand is set, use that instead of plane pos
+		get_stand_data(desired_stand, pos_x, pos_z, pos_hdg);
+	} else { // if it is set
+		pos_x = XPLMGetDataf(plane_x_pos_ref);
+		pos_z = XPLMGetDataf(plane_z_pos_ref);
+		pos_hdg = XPLMGetDataf(heading);
+	}
+
+
 	double x0, z0, x1, z1;
 
 	if (vehicle_type != "bus")
 	{
-		calculate_relative_point(acf_vehicle_name, vehicle_type, x0, z0, XPLMGetDataf(plane_x_pos_ref), XPLMGetDataf(plane_z_pos_ref), XPLMGetDataf(heading), 10, true);
-		calculate_relative_point(acf_vehicle_name, vehicle_type, x1, z1, XPLMGetDataf(plane_x_pos_ref), XPLMGetDataf(plane_z_pos_ref), XPLMGetDataf(heading), 0, true);
+		calculate_relative_point(acf_vehicle_name, vehicle_type, x0, z0, pos_x, pos_z, pos_hdg, 10, true);
+		calculate_relative_point(acf_vehicle_name, vehicle_type, x1, z1, pos_x, pos_z, pos_hdg, 0, true);
 
 		route[0].push_back(x0);
 		route[1].push_back(z0);
@@ -943,8 +954,8 @@ std::vector<std::vector<double>> global_mode_route(std::string acf_vehicle_name,
 		route[1].push_back(z1);
 	} else 
 	{ // bus doesn't move in global mode
-		calculate_relative_point(acf_vehicle_name, vehicle_type, x0, z0, XPLMGetDataf(plane_x_pos_ref), XPLMGetDataf(plane_z_pos_ref), XPLMGetDataf(heading));
-		calculate_relative_point(acf_vehicle_name, vehicle_type, x1, z1, XPLMGetDataf(plane_x_pos_ref), XPLMGetDataf(plane_z_pos_ref), XPLMGetDataf(heading), -5);
+		calculate_relative_point(acf_vehicle_name, vehicle_type, x0, z0, pos_x, pos_z, pos_hdg);
+		calculate_relative_point(acf_vehicle_name, vehicle_type, x1, z1, pos_x, pos_z, pos_hdg, -5);
 
 		route[0].push_back(x0);
 		route[1].push_back(z0);

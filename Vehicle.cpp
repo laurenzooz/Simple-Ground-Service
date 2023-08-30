@@ -297,7 +297,7 @@ void Vehicle::initialize()
 	} 
 	else {
 		drive_up_route = global_mode_route(assigned_acf_vehicle_name, vehicle_type);
-		drive_off_route = global_mode_route(assigned_acf_vehicle_name, vehicle_type);
+		drive_off_route = drive_up_route;
 	}
 	
 	
@@ -1438,8 +1438,8 @@ void Vehicle::menu_callback()
 	} else if (is_global && is_drive_off == 1 && (is_connect == 0 || vehicle_type == "bus")){ // global mode. Do not start driving, only set the position so that the vehicle is visible
 
 		// reset the route first as the plane position might have changed.
-		drive_up_route  = global_mode_route(assigned_acf_vehicle_name, vehicle_type);
-		drive_off_route = global_mode_route(assigned_acf_vehicle_name, vehicle_type);
+		drive_up_route  = global_mode_route(assigned_acf_vehicle_name, vehicle_type, desired_stand);
+		drive_off_route = drive_up_route;
 
 		route_coordinates[0].resize(0);
 		route_coordinates[1].resize(0);
@@ -1518,8 +1518,8 @@ void Stairtruck_small::menu_callback()
 
 	} else if (is_global && is_connect == 0) { // global mode. Do not start driving, only set the position so that the vehicle is visible
 
-		drive_up_route =  global_mode_route(assigned_acf_vehicle_name, vehicle_type);
-		drive_off_route = global_mode_route(assigned_acf_vehicle_name, vehicle_type);
+		drive_up_route =  global_mode_route(assigned_acf_vehicle_name, vehicle_type, desired_stand);
+		drive_off_route = drive_up_route;
 
 		route_coordinates[0].resize(0);
 		route_coordinates[1].resize(0);

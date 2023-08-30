@@ -24,7 +24,7 @@ std::vector<std::vector<double>> interpolate_midpoints(std::vector<std::vector<d
 
 double measure_path_distance(std::vector<std::vector<double>>);
 
-std::vector<std::vector<double>> global_mode_route(std::string, std::string);
+std::vector<std::vector<double>> global_mode_route(std::string, std::string, std::string desired_stand = "");
 
 
 #endif
