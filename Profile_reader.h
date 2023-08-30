@@ -41,9 +41,16 @@ void read_aircraft_config(std::vector<Vehicle_for_acf>&);
 
 
 
+std::vector<std::string> get_icaos();
+std::vector<std::string> get_scenery_names();
+
+
+// get the values
+
 // Look through custom sceneries, airports which have a profile, get their icao and add to list
 
 std::string get_icao(std::string); // given a apt_dat, return the ICAO 
+
 void get_supported_airports();
 bool is_supported(std::string icao = ""); // check wheter the ICAO can be found on the supported scenery list
 
@@ -52,7 +59,6 @@ std::string get_stands_txt_dir(std::string);
 std::string get_pax_txt_dir(std::string);
 
 
-std::string get_apt_dat_dir(std::string);
 std::string get_current_scenery_livery_dir(std::string);
 std::string get_current_scenery_obj_dir(std::string);
 

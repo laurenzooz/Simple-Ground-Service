@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <iostream>
 #include <algorithm>
+#include <utility>
 
 
 
@@ -184,9 +185,11 @@ std::string get_livery_for_vehicle(int index, std::string vehicle_type)
 std::string find_closest_stand(double x, double z, int& index)
 {
 
-	double shortest_dist = calculate_distance(x, z, stand_positions[0][0], stand_positions[1][0]);
-	std::string closest_stand = stand_names[0];
-	for (int i = 1; i < stand_names.size(); i++)
+	
+
+	double shortest_dist = 99999; // TODO: replace with smth sensible.
+	std::string closest_stand; 
+	for (int i = 0; i < stand_names.size(); i++)
 	{
 		double temp_dist = calculate_distance(x, z, stand_positions[0][i], stand_positions[1][i]);
 		if (temp_dist < shortest_dist)
@@ -371,7 +374,8 @@ void get_route_info(std::vector<std::vector<double>>& drive_up_route, std::vecto
 
 }
 
-std::vector<std::string> supported_airports;
+std::vector <std::pair<std::string, std::string>> supported_airports; // ICAO, sceneryname
+
 
 
 int get_amount_of_vehicle(std::string vehicle_type)
@@ -408,10 +412,6 @@ int get_amount_of_vehicle(std::string vehicle_type)
 }
 
 
-std::vector<std::vector<double>> airport_positions; // global, can be calculated once 
-
-
-
 std::string get_airport_data(airportdb_t &airportdb) {
 
     XPLMDataRef lon_ref = XPLMFindDataRef("sim/flightmodel/position/longitude");
@@ -443,6 +443,10 @@ std::string get_airport_data(airportdb_t &airportdb) {
 	stand_names.resize(0);
 	// empty the old stuff
 
+	if (!closest_airport) {
+		return "-1";
+	}
+
 	assert(closest_airport != NULL);
 
 	// push all ramp starts to stand_positions and stand_names vectors
@@ -460,6 +464,19 @@ std::string get_airport_data(airportdb_t &airportdb) {
 		stand_positions[2].push_back(ramp->hdgt);
 		stand_names.push_back(ramp->name);
 		// and name and hdg
+	}
+
+
+	// check if airport is supported; if yes, change the selected airport to the correct scenery name
+
+	// there might be a method to find this, and prolly should of used a map. But eh
+	for (int i = 0; i < supported_airports.size(); i++) {
+		
+		if (supported_airports[i].first == closest_airport->icao) {
+			selected_airport = supported_airports[i].second;
+			std::cout << "selected airport is now " << selected_airport << std::endl;
+			break;
+		}
 	}
 
 	return closest_airport->icao;
@@ -669,6 +686,38 @@ void read_aircraft_config(std::vector<Vehicle_for_acf>& Acf_vehicles)
 }
 
 
+
+
+
+std::vector<std::string> get_icaos() {
+	
+	std::vector<std::string> icaos;
+
+
+	for (int i = 0; i < supported_airports.size(); i++) { // get the keys 
+		icaos.push_back(supported_airports[i].first);
+		std::cout << "ICAO: " << icaos[i] << std::endl;
+	}
+
+	return icaos;
+}
+
+std::vector<std::string> get_scenery_names() {
+	
+	std::vector<std::string> sceneries;
+
+
+	for (int i = 0; i < supported_airports.size(); i++) { // get the keys 
+		sceneries.push_back(supported_airports[i].second);
+		std::cout << "Scenery name: " << sceneries[i] << std::endl;
+	}
+
+	return sceneries;
+}
+
+
+
+
 std::string get_icao(std::string path) {
 
 
@@ -693,6 +742,8 @@ std::string get_icao(std::string path) {
 
 
 
+
+
 void get_supported_airports() // scans through the full custom scenery folder. slow af, crashes if non english character in any folder/file/texture name or anything. 
 {
 	namespace fs = std::filesystem;
@@ -711,55 +762,46 @@ void get_supported_airports() // scans through the full custom scenery folder. s
 		if (dir.find("Simple Ground Service/routes.txt") != std::string::npos)
 		{
 
+
 			// 'Custom Scenery/' is n letters. Search for the next / after that to know where to add the earthnavdata/apt.dat thungy
 
-			int drop_index = dir.find("/", 15);
-			if (drop_index == std::string::npos) { return; }
+			int i = dir.find("/", 15); // this is where the name of the scenery ends, and after this add the apt.dat path
 
-			dir = dir.substr(0, drop_index + 1);
+			int j = dir.find("/", i + 1); // find the next /, to get the scenery name
+
+			std::string scenery_name =  dir.substr(15, i - 15);
+
+
+			if (i == std::string::npos) { return; }
+
+			dir = dir.substr(0, i + 1);
+
+
+			// get the scenery name
+
+
 			
 			// TODO: recheck if wstring makes any sense, maybe a better way to deal with non-english character. 
 
 			// find apt.dat
 			dir += "Earth nav data/apt.dat";
 
-			supported_airports.push_back(get_icao(dir));
+
+			//std::cout << "dir to icao, scenery name:  |" << dir << "|\t|" << scenery_name << "|" << std::endl;
+
+
+			supported_airports.push_back(std::make_pair(get_icao(dir), scenery_name));
 		}
 	}
-
-	
-	XPLMDebugString("SGS -- Scanning sceneries completed. Supported airports are; \n");
-	for (int i = 0; i < supported_airports.size(); i++)
-	{
-		XPLMDebugString(supported_airports[i].c_str());
-		XPLMDebugString("\n");
-	}	
 }
 
 bool is_supported(std::string icao) {
-	return (std::count(supported_airports.begin(), supported_airports.end(), icao)); 
+	
+	std::vector<std::string> icaos = get_icaos();
+	return (std::count(icaos.begin(), icaos.end(), icao)); // checks if icao exists within icaos vector
 }
 
 
-
-std::string get_apt_dat_dir(std::string scenery_name)
-{
-
-	std::string dir = "Custom Scenery/";
-	dir += scenery_name;
-	dir += "/Earth nav data/apt.dat";
-	// dir += "/Earth Nav Data/apt.dat";
-
-	// TODO: case sensitiveness on LINUX!!!!
-
-	/*
-	XPLMDebugString("SGS[DEBUG] -- Scenery directory: ");
-	XPLMDebugString(dir.c_str());
-	XPLMDebugString("\n");
-	*/
-
-	return dir;
-}
 
 std::string get_routes_txt_dir(std::string scenery_name)
 {

@@ -292,12 +292,10 @@ void Vehicle::initialize()
 	XPLMDebugString("\n");
 
 
-	if (is_global == false)
-	{
+	if (is_global == false) {
 		get_route_info(drive_up_route, drive_off_route, index, vehicle_type); // reads the profile file and creates the base routes
 	} 
-	else 
-	{
+	else {
 		drive_up_route = global_mode_route(assigned_acf_vehicle_name, vehicle_type);
 		drive_off_route = global_mode_route(assigned_acf_vehicle_name, vehicle_type);
 	}

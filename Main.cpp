@@ -300,14 +300,14 @@ static float update_nearest_airport(float time_since_last_call, float time_since
 				Stairs_small.resize(get_amount_of_vehicle("stair_small"));
 				Loaders.resize(get_amount_of_vehicle("belt_loader"));
 				Busses.resize(get_amount_of_vehicle("bus"));
-
-				
-
 			}
+
+			std::cout << "There are now " << Stairs_small.size() << " stairs\n";
 
 			// TODO: in global mode get the proper amount
 
-			std::cout << "is_global: " << is_global << std::endl;
+			// TODO: if not in global mode, assign as many local vehicles as possibles, but if can't do all (the amount of vehicles in acf-in scenery)
+			// assign rest in global mode
 
 				
 			for (int i = 0; i < Stairs_small.size(); i++) {
@@ -647,13 +647,16 @@ static void menu_open_cb(
 
 void set_desired_stand(std::string desired_stand)
 {
+
+
+
 	// Integration with AutoDGS: check if the autodgs dref exists
 	// (aka it's installed) and then set the stand via it's API (write to ramp_change dataref), and then activate
 
 	XPLMDataRef autodgs_ramp_name = XPLMFindDataRef("AutoDGS/ramp_change");
 	XPLMCommandRef autodgs_activate = XPLMFindCommand("AutoDGS/activate");
 
-	if (autodgs_ramp_name) {
+	if (autodgs_ramp_name && desired_stand.length() > 0) { // crashes with empty string
 
 		char stand_cstr [desired_stand.length() + 1];
 		strcpy(stand_cstr, desired_stand.c_str());
@@ -663,19 +666,14 @@ void set_desired_stand(std::string desired_stand)
 	}
 	
 
-	
-
-
 	if (is_custom_stair() == 1)
 	{
 		std::string name_temp;
 		custom_stair.initialize(get_custom_stair_data(name_temp)); // initialize custom stairs again
 
-
 		//XPLMDebugString("Custom Stairs are initialized. Gonna call for the set desired stand\n");
 		custom_stair.set_desired_stand(desired_stand);			
 	}
-
 
 	for (int i = 0; i < Stairs_small.size(); i++)
 	{
@@ -703,6 +701,8 @@ void set_desired_stand(std::string desired_stand)
 	for (int i = 0; i < acf_profile_vehicles.size(); i++)
 	{
 
+		//std::cout << "assigning\n";
+
 		acf_profile_vehicles[i].set_assigned_vehicle_index(-1); // unassign the old stuff
 
 		
@@ -710,16 +710,14 @@ void set_desired_stand(std::string desired_stand)
 
 		if (type == "stair_small")
 		{
-			std::cout << "Assigning stairs: ";
 			// TODO: check that can only assign to stands specified in airport profile (if not all) 
 			for (int j = 0; j < Stairs_small.size(); j++)
 			{	
-				std::cout << "curr : " << Stairs_small[j].get_assigned_acf_vehicle_name(); << "  next:  " << Stairs_small[j].get_assigned_acf_vehicle_name() <<std::endl;
 				//if (Stairs_small[j].get_assigned_acf_vehicle_name() == "$unassigned" && ((get_stands_for_route(j, type).find("all") != std::string::npos || get_stands_for_route(j, type).find(desired_stand) != std::string::npos) || is_global))
 				if (Stairs_small[j].get_assigned_acf_vehicle_name() == "$unassigned") // if an unassigned vehicle is found, assign it
 				{
 					acf_profile_vehicles[i].set_assigned_vehicle_index(j); 
-					Stairs_small[j].set_assigned_acf_vehicle_name(Stairs_small[j].get_assigned_acf_vehicle_name());
+					Stairs_small[j].set_assigned_acf_vehicle_name(acf_profile_vehicles[i].getname());
 					break;
 				}
 			}
