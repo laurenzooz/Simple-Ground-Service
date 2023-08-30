@@ -651,16 +651,16 @@ void set_desired_stand(std::string desired_stand)
 	// Integration with AutoDGS: check if the autodgs dref exists
 	// (aka it's installed) and then set the stand via it's API (write to ramp_change dataref), and then activate
 
-	XPLMDataRef autodgs_ramp_name = XPLMFindDataRef("AutoDGS/ramp_change");
+	XPLMDataRef autodgs_ramp_name = XPLMFindDataRef("AutoDGS/ramp_override_str");
 	XPLMCommandRef autodgs_activate = XPLMFindCommand("AutoDGS/activate");
 
-	if (autodgs_ramp_name && desired_stand.length() > 0) { // crashes with empty string
+	if (autodgs_ramp_name && desired_stand.length() > 0 && flight_phase) { 
+		// ctd with empty string. Also, check that landed
 
 		char stand_cstr [desired_stand.length() + 1];
 		strcpy(stand_cstr, desired_stand.c_str());
 		XPLMSetDatab(autodgs_ramp_name, &stand_cstr, 0, desired_stand.length() + 1);
 		
-		if (flight_phase) { (autodgs_activate); } // only activate if already taken off
 	}
 	
 
@@ -1031,7 +1031,7 @@ void SGS_menu::BuildInterface()
 
 		
 		// destroy passengers, then initialize them again and set the count to 0 
-
+		flight_phase = 0; // restart
 		reset_pax_count(); // count to 0.
 
 

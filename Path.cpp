@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 #include <cmath>
+#include <iostream>
 
 #include "Vehicle.h"
 #include "Path.h"
@@ -917,9 +918,7 @@ double measure_path_distance(std::vector<std::vector<double>> path)
 
 std::vector<std::vector<double>> global_mode_route(std::string acf_vehicle_name, std::string vehicle_type, std::string desired_stand)
 {
-	//XPLMDebugString("Setting global route!: ");
-	//XPLMDebugString(acf_vehicle_name.c_str());
-	//XPLMDebugString("\n");
+	
 
 	std::vector<std::vector<double>> route;
 	route.resize(2);
@@ -928,15 +927,28 @@ std::vector<std::vector<double>> global_mode_route(std::string acf_vehicle_name,
 	XPLMDataRef plane_x_pos_ref = XPLMFindDataRef("sim/flightmodel/position/local_x");
 	XPLMDataRef plane_z_pos_ref = XPLMFindDataRef("sim/flightmodel/position/local_z");
 	XPLMDataRef heading = XPLMFindDataRef("sim/flightmodel/position/psi");
+	
+	XPLMDataRef engine_running_ref = XPLMFindDataRef("sim/flightmodel/engine/ENGN_running");
 
+	int er[8];
+	bool is_running = false;
+	int n = XPLMGetDatavi(engine_running_ref, er, 0, 8);
+
+	for (int i = 0; i < n; i++) {
+		if (er[i]) { is_running = 1; break; }
+	}
+	
 	double pos_x, pos_z, pos_hdg;
 
-	if (desired_stand.length() > 0) { // if desired stand is set, use that instead of plane pos
-		get_stand_data(desired_stand, pos_x, pos_z, pos_hdg);
-	} else { // if it is set
+	// if no desired stand is set or no engine is running, use present position instead.
+	if (desired_stand.length() == 0 || !is_running) { 
+
 		pos_x = XPLMGetDataf(plane_x_pos_ref);
 		pos_z = XPLMGetDataf(plane_z_pos_ref);
 		pos_hdg = XPLMGetDataf(heading);
+
+	} else { // otherwise use the stand provided
+		get_stand_data(desired_stand, pos_x, pos_z, pos_hdg);
 	}
 
 

@@ -474,7 +474,6 @@ std::string get_airport_data(airportdb_t &airportdb) {
 		
 		if (supported_airports[i].first == closest_airport->icao) {
 			selected_airport = supported_airports[i].second;
-			std::cout << "selected airport is now " << selected_airport << std::endl;
 			break;
 		}
 	}
