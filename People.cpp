@@ -467,8 +467,8 @@ void Human::update_human(std::vector<Human*> other_people, double deltaT, double
 
 	// normaalisti siis t�n jalan askel loppuis 3.10, virhemarginaalin kanssa otetaan 3.20
 
-	double step_height = 0.173 * cos(-draw_info.pitch * (M_PI / 180)); // need the absolute height change
-	// double step_height = 0.1736;
+	//double step_height = 0.173 * cos(-draw_info.pitch * (M_PI / 180)); // need the absolute height change
+	 double step_height = 0.1736;
 	//double step_height = 0.1741;
 
 	if (is_for_custom_stairs == 1) { step_height = custom_step_height; }
@@ -502,7 +502,7 @@ void Human::update_human(std::vector<Human*> other_people, double deltaT, double
 		if (anim_data[0] >= 4.60 && anim_data[0] <= 5.80 && current_stair_height_change > -step_height) 
 		{
 			//vertical_speed = 0.69259;
-			vertical_speed = -0.85;
+			vertical_speed = -0.7;
 			//vertical_speed = 0.75;
 			//XPLMDebugString("Descending!!\n");
 		}	
@@ -510,7 +510,7 @@ void Human::update_human(std::vector<Human*> other_people, double deltaT, double
 		else if (anim_data[0] >= 6.10 && anim_data[0] <= 7.10 && current_stair_height_change > -step_height)
 		{
 			//vertical_speed = 0.69259;
-			vertical_speed = -0.85;
+			vertical_speed = -0.7;
 			//vertical_speed = 0.72;
 			//XPLMDebugString("Descending!!\n");
 		

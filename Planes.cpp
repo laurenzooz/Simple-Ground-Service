@@ -178,7 +178,7 @@ void calculate_relative_point(std::string name, std::string type, double& x, dou
 	// when preparing, different position
 	if (is_for_prepare == 1)
 	{
-		ac_z = 5;
+		ac_z = 15;
 		ac_hdg = 180;
 		// left or right side of the plane
 		/*
@@ -189,11 +189,11 @@ void calculate_relative_point(std::string name, std::string type, double& x, dou
 
 		if (ac_x < 0)
 		{
-			ac_x = - 20 - (profile_index * 4);
+			ac_x = - 25 - (profile_index * 4);
 		}
 		else
 		{
-			ac_x =	 20 + ((profile_index - 2) * 4);
+			ac_x =	 25 + ((profile_index - 2) * 4);
 
 		}
 		/*

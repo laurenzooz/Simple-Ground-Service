@@ -343,7 +343,7 @@ static float update_nearest_airport(float time_since_last_call, float time_since
 		Busses.resize(0);
 		old_nearest_airport = "";
 
-		flight_phase = 1;
+		if (isReady == 0) {flight_phase = 1;}
 	}
 	return 10;
 }
@@ -660,6 +660,8 @@ void set_desired_stand(std::string desired_stand)
 		char stand_cstr [desired_stand.length() + 1];
 		strcpy(stand_cstr, desired_stand.c_str());
 		XPLMSetDatab(autodgs_ramp_name, &stand_cstr, 0, desired_stand.length() + 1);
+
+		XPLMCommandOnce(autodgs_activate);
 		
 	}
 	
